@@ -23,8 +23,15 @@ public class ChatServer {
         }
     }
 
+    //prototype logout function
+    public synchronized void  logOut(String username,ChatServerThread thread){
+        userlist.remove(username);
+        clientList.remove(thread);
+        thread.interrupt();
+    }
+
     //check if the username is taken, if not then add him to the list
-    private boolean addUser(String name){
+    public synchronized boolean addUser(String name){
         for(String user:userlist){
             if(user.equals(name))return false;
         }
