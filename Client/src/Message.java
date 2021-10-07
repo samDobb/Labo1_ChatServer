@@ -19,7 +19,6 @@ public class Message {
         this.text=text;
         this.timestamp=timestamp;
     }
-
     @Override
     public String toString(){
         return type+";"+username+";"+text+";"+timestamp;

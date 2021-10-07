@@ -1,13 +1,16 @@
 import java.io.*;
 import java.net.Socket;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ChatServerThread extends Thread{
 
     private String username;
     private Socket socket;
     private ChatServer server;
-    private ObjectInputStream  in;
-    private ObjectOutputStream  out;
+    private BufferedReader  in;
+    private PrintWriter  out;
     private boolean loggedIn=true;
 
 
@@ -15,48 +18,61 @@ public class ChatServerThread extends Thread{
         super();
         this.socket=socket;
         server=chatServer;
+    }
+
+    public void run(){
         try {
             //object input stream
-            in =  new ObjectInputStream (socket.getInputStream());
+            in =  new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             //output stream
-            out = new ObjectOutputStream(socket.getOutputStream());
+            out =  new PrintWriter(socket.getOutputStream(), true);
 
+            String[] message;
             while(loggedIn){
 
-                Message message= (Message) in.readObject();
+                message=  in.readLine().split(";");
 
-                if(message.getType() == 0){
-                    if(server.addUser(message.getUsername())){
-                        username=message.getUsername();
+                if(message!=null)System.out.println("message ontvangen");
+
+                //login type
+                if(message[0].equals("0")){
+                    if(server.addUser(message[1])){
+                        server.addClient(this);
+                        username=message[1];
+                        out.println(new Message(0,username,"True",null).toString());
                     }
                     else{
-                        out.writeObject(new Message(0,username,"False",null));
+                        out.println(new Message(0,username,"False",null).toString());
                     }
                 }
-                else if(message.getType() == 1){
+                //textmessage type
+                else if(message[0].equals("1")){
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+                    Date parsedDate = dateFormat.parse(message[3]);
+                    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+
+                    server.broadcast(new Message(Integer.parseInt(message[0]),message[1],message[2],timestamp));
 
                 }
-                else if(message.getType() == 2){
+                //logout type
+                else if(message[0].equals("2")){
                     loggedIn=false;
                     socket.close();
                     server.logOut(username,this);
                 }
                 else{
-                    System.out.println("Unkown type of message detected");
+                    System.out.println("Unknown type of message detected");
                 }
             }
 
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
-
     }
 
-    public void run(){
-
-
+    public void sendMessage(Message message){
+        out.println(message.toString());
     }
 }

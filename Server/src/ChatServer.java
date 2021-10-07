@@ -12,10 +12,13 @@ public class ChatServer {
         try(
                 ServerSocket serverSocket=new ServerSocket(4444)
                 ){
+
+            System.out.println("Server opgestart");
             while(true){
+                System.out.println("while loop");
                 ChatServerThread client=new ChatServerThread(serverSocket.accept(),this);
-                clientList.add(client);
                 client.start();
+
             }
 
         }catch (Exception e ){
@@ -39,9 +42,19 @@ public class ChatServer {
         return true;
     }
 
+    public void addClient(ChatServerThread thread){
+        clientList.add(thread);
+    }
+
     //returns the entire username list
     private List<String> getUserlist(){
         return userlist;
+    }
+
+    public synchronized void broadcast(Message message){
+            for(ChatServerThread thread: clientList){
+                thread.sendMessage(message);
+            }
     }
 
 }
