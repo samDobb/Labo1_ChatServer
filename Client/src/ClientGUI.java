@@ -22,8 +22,11 @@ public class ClientGUI implements ActionListener {
     private  JTextField message;
     private  JTextField username;
 
+    private  JList<String> friendsList;
+
     private Socket clientToServer;
-    private List<Message> chatMessages;
+    private List<Message> chatMessages; //mis niet nodig
+
 
     private PrintWriter out;
     private BufferedReader in;
@@ -61,13 +64,24 @@ public class ClientGUI implements ActionListener {
         panel.add(login);
         panel.add(logout);
 
+        String[] userList;
+        JPanel friendsPanel = new JPanel();
+        friendsList = new JList<>(new String[]{"name", "test", "misschien"});
+
+        friendsPanel.add(friendsList);
+
+        JPanel chatPanel=new JPanel();
+
         // chat Area at the Center
         chatArea = new JTextArea();
         chatMessages=new ArrayList<>();
 
-        //Adding Components to the frame.
+        chatPanel.add(chatArea);
+
+        //Adding Components to the frame
         frame.getContentPane().add(BorderLayout.SOUTH, panel);
-        frame.getContentPane().add(BorderLayout.CENTER, chatArea);
+        frame.getContentPane().add(BorderLayout.WEST, chatPanel);
+        frame.getContentPane().add(BorderLayout.EAST, friendsPanel);
         frame.setVisible(true);
 
     }
@@ -82,7 +96,6 @@ public class ClientGUI implements ActionListener {
         if(e.getSource()==login && !loggedIn){
             try{
                 clientToServer= new Socket("127.0.0.1",4444);
-
 
                 in =new BufferedReader(new InputStreamReader(clientToServer.getInputStream()));
 
@@ -107,6 +120,11 @@ public class ClientGUI implements ActionListener {
         else if (e.getSource() == send && !loggedIn){
             message.setText("U moet eerst inloggen");
         }
+    }
+
+    public void setUserList(String userLijst) {
+        String[] lijst = userLijst.split("/");
+        friendsList.setListData(lijst);
     }
 
     public void setname(String string){

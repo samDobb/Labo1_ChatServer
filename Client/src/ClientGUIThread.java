@@ -27,7 +27,6 @@ public class ClientGUIThread extends Thread{
             try {
                 messageparts = in.readLine().split(";");
 
-
                 //login type
                 if (messageparts[0].equals("0")) {
                     if (messageparts[1].equals(client.getUsername().getText()) && messageparts[2].equals("True")) {
@@ -39,7 +38,7 @@ public class ClientGUIThread extends Thread{
                     }
                 }
                 //textmessage type
-                else if (messageparts[0].equals("1")) {
+                else if (messageparts[0].equals("1") && client.isLoggedIn()) {
 
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
                     Date parsedDate = dateFormat.parse(messageparts[3]);
@@ -51,9 +50,14 @@ public class ClientGUIThread extends Thread{
                     client.insertChatArea(m);
                 }
                 //logout type
-                else if (messageparts[0].equals("2")) {
+                else if (messageparts[0].equals("2")&& client.isLoggedIn()) {
 
-                } else {
+                }
+                else if(messageparts[0].equals("3")&& client.isLoggedIn()){
+
+                    client.setUserList(messageparts[2]);
+                }
+                else {
                     System.out.println("Unknown type of message detected");
                 }
 

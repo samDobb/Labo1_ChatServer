@@ -2,7 +2,9 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ChatServerThread extends Thread{
 
@@ -12,6 +14,8 @@ public class ChatServerThread extends Thread{
     private BufferedReader  in;
     private PrintWriter  out;
     private boolean loggedIn=true;
+
+    private List<String> userList= new ArrayList<>();
 
 
     public ChatServerThread(Socket socket,ChatServer chatServer){
@@ -41,6 +45,7 @@ public class ChatServerThread extends Thread{
                         server.addClient(this);
                         username=message[1];
                         out.println(new Message(0,username,"True",null).toString());
+                        server.sendUserList(username);
                     }
                     else{
                         out.println(new Message(0,username,"False",null).toString());
@@ -62,6 +67,7 @@ public class ChatServerThread extends Thread{
                     socket.close();
                     server.logOut(username,this);
                 }
+
                 else{
                     System.out.println("Unknown type of message detected");
                 }
@@ -71,6 +77,11 @@ public class ChatServerThread extends Thread{
             e.printStackTrace();
         }
     }
+
+    public List<String> getUserList() {
+        return userList;
+    }
+
 
     public void sendMessage(Message message){
         out.println(message.toString());
