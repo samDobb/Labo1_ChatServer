@@ -27,6 +27,7 @@ public class ClientGUI implements ActionListener {
     private Socket clientToServer;
     private List<Message> chatMessages; //mis niet nodig
 
+    ClientGUIThread thread;
 
     private PrintWriter out;
     private BufferedReader in;
@@ -66,7 +67,7 @@ public class ClientGUI implements ActionListener {
 
         String[] userList;
         JPanel friendsPanel = new JPanel();
-        friendsList = new JList<>(new String[]{"name", "test", "misschien"});
+        friendsList = new JList<>();
 
         friendsPanel.add(friendsList);
 
@@ -88,7 +89,7 @@ public class ClientGUI implements ActionListener {
 
     public void insertChatArea(Message m){
         chatArea.append("\n");
-        chatArea.append(m.toString());
+        chatArea.append(m.toChatString());
     }
 
     @Override
@@ -97,13 +98,14 @@ public class ClientGUI implements ActionListener {
             try{
                 clientToServer= new Socket("127.0.0.1",4444);
 
+                //input stream
                 in =new BufferedReader(new InputStreamReader(clientToServer.getInputStream()));
-
-                ClientGUIThread thread = new ClientGUIThread(this, in);
-                thread.start();
 
                 //output stream
                 out = new PrintWriter(clientToServer.getOutputStream(), true);
+
+                thread = new ClientGUIThread(this, in);
+                thread.start();
 
                 out.println(new Message(0,username.getText(),null,null).toString());
 
@@ -119,6 +121,14 @@ public class ClientGUI implements ActionListener {
         }
         else if (e.getSource() == send && !loggedIn){
             message.setText("U moet eerst inloggen");
+        }
+        else if (e.getSource() == logout && loggedIn){
+            out.println(new Message(2,username.getText(),null,null).toString());
+            loggedIn=false;
+            login.setText("Login");
+            username.setText("");
+            friendsList.setListData(new String[0]);
+            thread.interrupt();
         }
     }
 

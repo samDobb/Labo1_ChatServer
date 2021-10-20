@@ -45,7 +45,7 @@ public class ChatServerThread extends Thread{
                         server.addClient(this);
                         username=message[1];
                         out.println(new Message(0,username,"True",null).toString());
-                        server.sendUserList(username);
+                        server.sendUserList(username,false);
                     }
                     else{
                         out.println(new Message(0,username,"False",null).toString());

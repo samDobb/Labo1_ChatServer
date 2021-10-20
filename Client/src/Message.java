@@ -19,6 +19,9 @@ public class Message {
         this.text=text;
         this.timestamp=timestamp;
     }
+
+    public String toChatString(){return username +" "+timestamp + "\n"+text+"\n\n";}
+
     @Override
     public String toString(){
         return type+";"+username+";"+text+";"+timestamp;

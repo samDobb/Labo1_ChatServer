@@ -16,8 +16,6 @@ public class ClientGUIThread extends Thread{
     public ClientGUIThread(ClientGUI gui, BufferedReader socket) {
         client=gui;
         in=socket;
-
-        System.out.println("constructor ok");
     }
 
     public void run() {
@@ -49,10 +47,7 @@ public class ClientGUIThread extends Thread{
                     client.getChatMessages().add(m);
                     client.insertChatArea(m);
                 }
-                //logout type
-                else if (messageparts[0].equals("2")&& client.isLoggedIn()) {
-
-                }
+                //userlist type
                 else if(messageparts[0].equals("3")&& client.isLoggedIn()){
 
                     client.setUserList(messageparts[2]);

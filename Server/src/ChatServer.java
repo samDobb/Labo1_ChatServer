@@ -30,6 +30,9 @@ public class ChatServer {
     //prototype logout function
     public synchronized void  logOut(String username,ChatServerThread thread){
         userlist.remove(username);
+
+        sendUserList(username,true);
+
         clientList.remove(thread);
         thread.interrupt();
     }
@@ -52,14 +55,19 @@ public class ChatServer {
         return userlist;
     }
 
-    public synchronized void sendUserList(String username){
+    public synchronized void sendUserList(String username,boolean type){
+        if(type){
+            userlist.remove(username);
+        }
 
         String userList="";
 
         for(int i = 0 ; i <userlist.size();i++){
             userList=userList.concat(userlist.get(i)).concat("/");
         }
-        broadcast(new Message(3,username,userList,null));
+
+        broadcast(new Message(3, username, userList, null));
+
     }
 
     public synchronized void broadcast(Message message){
